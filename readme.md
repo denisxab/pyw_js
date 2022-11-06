@@ -1,1 +1,1 @@
-Вся документация в `https://github.com/denisxab/py_wjs`
+Вся документация в https://github.com/denisxab/py_wjs
