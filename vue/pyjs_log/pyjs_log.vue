@@ -13,7 +13,7 @@
                     type="button"
                     value="Разорвать связь"
                 />
-                <input
+                <!-- <input
                     @click="TestSend"
                     type="button"
                     value="Проверочный запрос"
@@ -22,7 +22,7 @@
                     @click="GetAllowedFunc"
                     type="button"
                     value="Доступные функции"
-                />
+                /> -->
             </div>
         </div>
     </transition>
@@ -140,8 +140,8 @@ input {
     bottom: 0;
     right: 0;
     background: $ЦветФона;
-    height: 50vw;
-    width: 50vw;
+    height: 80vh;
+    width: 80vw;
     overflow: auto;
     border: none;
     padding: 8px;
@@ -151,7 +151,7 @@ input {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
-        height: 90%;
+        height: 96%;
         span {
             align-self: flex-start;
             margin-bottom: 8px;
