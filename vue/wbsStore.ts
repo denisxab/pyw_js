@@ -107,30 +107,35 @@ export const wbsStore = {
             );
         },
         /* Инициализация Web Socket */
-        initWebSocket({ commit, dispatch }) {
+        initWebSocket(
+            { commit, dispatch },
+            { after_connect = <CallableFunction>undefined }
+        ) {
             commit(
                 "_updateWbsObj",
-                new Wbs(
-                    token,
-                    {
-                        host: host,
-                        port: port,
-                        callback_onopen: () => {},
-                        callback_onmessage: (response: ServerWbsResponse) => {
-                            dispatch("_handleResponseFormServer", response);
-                        },
-                        callback_onclose: () => {},
-                        callback_onerror: (event) => {},
-                        event_connect: () => {},
-                        event_error_connect: () => {},
+                new Wbs(token, {
+                    host: host,
+                    port: port,
+                    callback_onopen: () => {
+                        after_connect();
                     },
-                    (status_code: WbsConnectStatus, status_text: string) => {
+                    callback_onmessage: (response: ServerWbsResponse) => {
+                        dispatch("_handleResponseFormServer", response);
+                    },
+                    callback_onclose: () => {},
+                    callback_onerror: (event) => {},
+                    event_connect: () => {},
+                    event_error_connect: () => {},
+                    callback_update_status: (
+                        status_code: WbsConnectStatus,
+                        status_text: string
+                    ) => {
                         dispatch("_onUpdateStatus", {
                             status_code,
                             status_text,
                         });
-                    }
-                )
+                    },
+                })
             );
         },
         /* Обработка ответа от сервера */

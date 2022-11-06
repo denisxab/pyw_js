@@ -92,8 +92,10 @@ export interface TTransaction_set {
         rollback_because_error: CallableFunction;
     };
 }
-/* ------------------------------------------------------------------ */
+// Сколько по умолчанию ждать ответ от сервера
+const _timeout_ms: number = 2000;
 
+/* ------------------------------------------------------------------ */
 /* Логика WebSocket */
 export class Wbs {
     /*
@@ -115,8 +117,10 @@ export class Wbs {
     _dependent_list: any[];
     // Указывает на то что было переподключение
     _is_reconnected: boolean = false;
+    // Идентификатор интервала переподключения к серверу
+    _idInterval_smart_connect: number = undefined;
     // Функция обновления статуса
-    _CallbackUpdateStatus: (
+    callback_update_status: (
         status_code: WbsConnectStatus,
         status_text: string
     ) => void | undefined;
@@ -133,11 +137,11 @@ export class Wbs {
             callback_onerror = (event: Event) => {},
             event_connect = () => {},
             event_error_connect = () => {},
-        } = {},
-        CallbackUpdateStatus: (
-            status_code: WbsConnectStatus,
-            status_text: string
-        ) => void | undefined = undefined
+            callback_update_status: callback_updateS_status = (
+                status_code: WbsConnectStatus,
+                status_text: string
+            ) => {},
+        } = {}
     ) {
         /*
 		token: Токен для сервера. Это обеспечивает безопасность для сервера, 
@@ -147,14 +151,14 @@ export class Wbs {
 		host: Хост
 		port: Порт
 
-		callback_onopen: Функция для отправки сообщений на сервер через WebSocket 
-		callback_onmessage: Функция для получения сообщений от сервера через WebSocket 
+		callback_onopen: Функция для отправки сообщений на сервер через WebSocket. Вызовется один раз при инициализации 
+		callback_onmessage: Функция для получения сообщений от сервера через WebSocket. 
 
-		callback_onclose: Функция обработка закрытия соединения с сервером
-		callback_onerror: Функция обработок ошибок при отправке на сервер
+		callback_onclose: Функция обработка закрытия соединения с сервером.
+		callback_onerror: Функция обработок ошибок при отправке на сервер.
 
-		event_connect: Событие = Успешное подключение к серверу
-		event_error_connect: Событие = Не удалось подключиться к серверу
+		event_connect: Событие = Успешное подключение к серверу, будет вызываться при каждом успешном подключение. 
+		event_error_connect: Событие = Не удалось подключиться к серверу.
 
         CallbackUpdateStatus: Функция обрабатывающая изменения статуса подключения в Web Socket
 
@@ -164,15 +168,25 @@ export class Wbs {
         this.token = token;
         this.w_status = 0;
         this._generator_uid_c = 0;
-        this._CallbackUpdateStatus = CallbackUpdateStatus;
+        this.callback_update_status = callback_updateS_status;
         this._dependent_list = [];
         // Инициализация подключения по протоколу WebSocket к Python серверу
         let tmp_wbs = new WebSocket(`ws://${host}:${port}/`);
         // ------------------ Заранее указываем функции ----------------------
         // Функция в которой происходит отправка.
         tmp_wbs.onopen = (event) => {
+            // Если это первое подключение, то отчищаем(не ждем) интервал переподключения к серверу.
+            clearInterval(this._idInterval_smart_connect);
+            // Обновляем статус "на подключено"
+            this._update_status(
+                WbsConnectStatus.connect,
+                `Успешное подключение к ${this._wbs_connect.url}`
+            );
             // Первым сообщением отправляем токен, для аутентификации подключения
             this._send_token();
+            // Вызываем пользовательский обработчик события подключения к серверу
+            if (event_connect) event_connect();
+            // Вызываем пользовательскую функцию
             if (callback_onopen !== undefined)
                 callback_onopen(<MessageEvent>event);
         };
@@ -225,15 +239,16 @@ export class Wbs {
         // Реализуем логику обработки событий "успешного" и "ошибочного" подключения к северу.
         this._smart_connect(tmp_wbs, event_connect, event_error_connect);
     }
-
+    //
     /* Отправить сообщение*/
+    //
     send({ mod, h_id, uid_c, body }: SendParams) {
         // Если не указан uid_c то генерируем его.
         if (uid_c === undefined) uid_c = this.getUidC();
         // Если еть подключение то отправляем сообщение
         if (
-            this.w_status == WbsConnectStatus.connect &&
-            this._wbs_connect !== undefined
+            this._wbs_connect !== undefined &&
+            this.w_status == WbsConnectStatus.connect
         ) {
             this._wbs_connect.send(
                 JSON.stringify(<ClientsWbsRequest>{
@@ -251,7 +266,10 @@ export class Wbs {
         }
     }
     /* Принудительная отправка сообщения */
-    send_force({ mod, h_id, uid_c, body }: SendParams, ms = <number>5000) {
+    send_force(
+        { mod, h_id, uid_c, body }: SendParams,
+        timeout_ms = <number>_timeout_ms
+    ) {
         /*
 		Сообщение отправиться на сервер, но если на него не получен ответ,
 		то сообщение будут снова отправлено, 
@@ -296,11 +314,14 @@ export class Wbs {
                     // Прекратить переотправку сообщения, если `uid` нет в транзакт листе
                     clearInterval(idInterval);
                 }
-            }, ms);
+            }, timeout_ms);
         }
     }
     /* Сохранение команд для зависимостей и отправка их, переотправка осуществляется в `_re_send_dependent` */
-    send_dependent({ mod, h_id, uid_c, body }: SendParams, ms = <number>2000) {
+    send_dependent(
+        { mod, h_id, uid_c, body }: SendParams,
+        timeout_ms = <number>_timeout_ms
+    ) {
         /*
 		Особый режим отправки сообщения. В этом режиме если вы потеряли связь с сервером
 		то при восстановление связи, все сообщение которые отправлены через этот метод, будут перенаправлены.
@@ -314,7 +335,7 @@ export class Wbs {
             mod: mod,
             uid_c: uid_c,
             d: { h_id: h_id, body: body },
-            ms,
+            ms: timeout_ms,
         };
         this._dependent_list.push(request);
         this.send_force(
@@ -331,7 +352,7 @@ export class Wbs {
     send_transaction(
         { mod, h_id, uid_c, body }: SendParams,
         rollback: TRollback,
-        timeout_ms_notify = <number>1000,
+        timeout_ms_notify = <number>_timeout_ms,
         timeout_ms_response = <number>5000
     ) {
         /*
@@ -420,19 +441,9 @@ export class Wbs {
             rollback(TRollbackErrorCode.duplicate_uid, h_id, uid_c, undefined);
         }
     }
-    /* Закрыть соединение */
-    close(code?: WbsCloseStatus, msg?: string) {
-        /*
-        code: Код закрытия
-        msg: Сообщение серверу
-		*/
-        this._wbs_connect.close(code, msg);
-    }
-    /* Получить уникальный uid_c */
-    getUidC(): number {
-        return this._GeneratorUidC();
-    }
-    // ------------------------------------------------------------------------------
+    //
+    //
+    //
     /* Отправляем токен на сервер */
     _send_token() {
         this.send({
@@ -463,8 +474,23 @@ export class Wbs {
     _update_status(status_code: WbsConnectStatus, status_text: string) {
         console.info(status_text);
         this.w_status = status_code;
-        if (this._CallbackUpdateStatus !== undefined)
-            this._CallbackUpdateStatus(status_code, status_text);
+        if (this.callback_update_status !== undefined)
+            this.callback_update_status(status_code, status_text);
+    }
+    //
+    //
+    //
+    /* Закрыть соединение */
+    close(code?: WbsCloseStatus, msg?: string) {
+        /*
+        code: Код закрытия
+        msg: Сообщение серверу
+		*/
+        this._wbs_connect.close(code, msg);
+    }
+    /* Получить уникальный uid_c */
+    getUidC(): number {
+        return this._GeneratorUidC();
     }
     /* Логика подключения к серверу, и переподключение к нему если соединение закрыто. */
     _smart_connect(
@@ -476,7 +502,7 @@ export class Wbs {
         // Проверяем соединение с сервером через указанное количество миллисекунд
         // Если соединение не удалось, то пытаемся еще раз подключиться к серверу
         // Также вызываем пользовательские обработчики событий "успешного" и "ошибочного" подключения.
-        const idInterval = setInterval(() => {
+        this._idInterval_smart_connect = setInterval(() => {
             this._update_status(
                 WbsConnectStatus.wait_connect,
                 `Попытка подключится к ${this._wbs_connect.url} > ${this._wbs_connect.readyState}`
@@ -508,14 +534,14 @@ export class Wbs {
                 this._wbs_connect.onmessage = use_wbs.onmessage;
                 this._wbs_connect.onerror = use_wbs.onerror;
                 this._wbs_connect.onclose = use_wbs.onclose;
-                // Отправляем первым сообщением токен
-                this._send_token();
+                // Отправляем первым сообщением токен, если это переподключение(не Первое подключение)
+                if (this._is_reconnected) this._send_token();
                 // Вызываем пользовательский обработчик события подключения к серверу
                 if (event_connect) event_connect();
                 // Пере отправить зависимости, если это переподключение
                 if (this._is_reconnected) this._again_send_dependent();
                 // Прекращаем переподключение
-                clearInterval(idInterval);
+                clearInterval(this._idInterval_smart_connect);
             }
         }, mc);
     }
