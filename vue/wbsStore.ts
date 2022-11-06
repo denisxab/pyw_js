@@ -109,8 +109,17 @@ export const wbsStore = {
         /* Инициализация Web Socket */
         initWebSocket(
             { commit, dispatch },
-            { after_connect = <CallableFunction>undefined }
+            {
+                after_connect = <CallableFunction>undefined,
+                destruction = <CallableFunction>undefined,
+            }
         ) {
+            /*
+            after_connect: Что сделать после подключения к серверу
+            destruction: Обработка события window.beforeunload
+            */
+
+            // Создаем подключение
             commit(
                 "_updateWbsObj",
                 new Wbs(token, {
@@ -137,6 +146,13 @@ export const wbsStore = {
                     },
                 })
             );
+            // Добавляем обработчик закрытия страницы, здесь нужно выполнять отчистку ресурсов.
+            window.addEventListener("beforeunload", (e) => {
+                destruction();
+                console.log(`Вызван destruction`);
+                e.preventDefault();
+                return (e.returnValue = "Да?");
+            });
         },
         /* Обработка ответа от сервера */
         _handleResponseFormServer({ commit }, response: ServerWbsResponse) {
