@@ -1,0 +1,54 @@
+$ЦветФона: #2e3440;
+$БазовыйЦветТекста: #eceff4;
+$ПриглушенныйЦветТекста: #d8dee9;
+$ЦветВыделениеТекста: #5e81ac;
+$БазовыйЦветСсылки: #5e81ac;
+$БазовыйЦветПосещеннойСсылки: #81a1c1;
+$ЦветФонаВсплывающегоОкна: #3b4252;
+$ЦветФонаПодсказки: #434c5e;
+$ЯркоеВыделение: #ebcb8b;
+$ЯркоеВыделение2: #88c0d0;
+$Хорошо: #a3be8c;
+$Среднее: #ebcb8b;
+$Плохо: #d08770;
+$h6_color: #22252a;
+$h5_color: #2e3238;
+$h4_color: #2f333a;
+$h3_color: #393e46;
+$h2_color: #454a54;
+$h1_color: #505762;
+$h_color: #abb0ba;
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h6,
+h5,
+h4,
+h3,
+h2,
+h1 {
+    padding: 10px;
+}
+
+h6 {
+    background: $h6_color;
+}
+h5 {
+    background: $h5_color;
+}
+h4 {
+    background: $h4_color;
+}
+h3 {
+    background: $h3_color;
+}
+h2 {
+    background: $h2_color;
+}
+h1 {
+    background: $h1_color;
+}
