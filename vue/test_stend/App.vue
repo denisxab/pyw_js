@@ -1,0 +1,203 @@
+<template>
+    <PyjsLog v-model:isShow="isShow" />
+    <div class="app">
+        <div class="test_box">
+            <testUseServer
+                :get_h_id="test_send.get_h_id"
+                :label="`Стенд для тестирования`"
+                :template="test_send.template"
+                :type_send="test_send.type_send"
+                @send="send"
+                @send_force="send_force"
+                @send_dependent="send_dependent"
+                @send_transaction="send_transaction"
+            />
+        </div>
+    </div>
+</template>
+<script lang="ts">
+import PrettyJson from "../pyjs_log/prettyJson/prettyJson.vue";
+import TestUseServer from "./components/testUseServer.vue";
+import PyjsLog from "../pyjs_log/pyjs_log.vue";
+import {
+    ClientsWbsRequest,
+    ClientsWbsRequest_GetInfoServer_id,
+    ClientsWbsRequest_Mod,
+} from "../../wbs_type";
+import { TRollbackErrorCode } from "../../wbs";
+
+function strJSON(obj: object) {
+    return JSON.stringify(obj, null, 4);
+}
+export interface TTemplateTestSend {
+    [key: string]: string;
+}
+// Варианты отправки
+export type TTypeSend =
+    | "send"
+    | "send_force"
+    | "send_dependent"
+    | "send_transaction";
+
+const get_h_id = 89;
+
+export default {
+    components: {
+        PyjsLog,
+        PrettyJson,
+        TestUseServer,
+    },
+    data() {
+        return {
+            isShow: false,
+            // Проверка обычной отправки SEND
+            test_send: {
+                get_h_id: get_h_id,
+                type_send: <TTypeSend[]>[
+                    "send",
+                    "send_force",
+                    "send_dependent",
+                    "send_transaction",
+                ],
+                template: <TTemplateTestSend>{
+                    exec: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.exec,
+                        h_id: get_h_id,
+                        body: {
+                            exec: "2+2",
+                        },
+                    }),
+                    import_from_server: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.import_from_server,
+                        h_id: get_h_id,
+                        body: {
+                            import_sts_exe: "import os",
+                        },
+                    }),
+                    func: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.func,
+                        h_id: get_h_id,
+                        body: {
+                            n_func: "os_exe_async",
+                            args: ["ifconfig"],
+                            kwargs: {},
+                        },
+                    }),
+                    "func:transaction": strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.func,
+                        h_id: get_h_id,
+                        body: {
+                            n_func: "readFile",
+                            args: [
+                                "/media/denis/dd19b13d-bd85-46bb-8db9-5b8f6cf7a825/Dowload/tes/",
+                                "test.txt",
+                            ],
+                            kwargs: {},
+                        },
+                    }),
+                    "info:help_allowed": strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.info,
+                        h_id: get_h_id,
+                        body: {
+                            id_r: ClientsWbsRequest_GetInfoServer_id.help_allowed,
+                        },
+                    }),
+                    "info:info_event": strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.info,
+                        h_id: get_h_id,
+                        body: {
+                            id_r: ClientsWbsRequest_GetInfoServer_id.info_event,
+                        },
+                    }),
+                    create_event: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.create_event,
+                        h_id: get_h_id,
+                        body: {
+                            n_func: "watchDir",
+                            mod: "_",
+                            args: [
+                                "/media/denis/dd19b13d-bd85-46bb-8db9-5b8f6cf7a825/Dowload/",
+                            ],
+                            kwargs: {},
+                        },
+                    }),
+                    sub_event: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.sub_event,
+                        h_id: get_h_id,
+                        body: {
+                            n_func: "watchDir",
+                            mod: "_",
+                        },
+                    }),
+                    unsub_event: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.unsub_event,
+                        h_id: get_h_id,
+                        body: {
+                            n_func: "watchDir",
+                            mod: "_",
+                        },
+                    }),
+                },
+            },
+        };
+    },
+    // Методы
+    methods: {
+        send(request) {
+            const r = JSON.parse(request);
+            console.log("send");
+            console.log(r);
+            this.$store.dispatch(`wbs/send`, r);
+        },
+        send_force(request) {
+            const r = JSON.parse(request);
+            console.log("send_force");
+            console.log(r);
+            this.$store.dispatch(`wbs/send_force`, r);
+        },
+
+        send_dependent(request) {
+            const r = JSON.parse(request);
+            console.log("send_dependent");
+            console.log(r);
+            this.$store.dispatch(`wbs/send_dependent`, r);
+        },
+        send_transaction(request) {
+            const r = JSON.parse(request);
+            console.log("send_transaction");
+            r["rollback"] = <TRollback>(
+                error_code: TRollbackErrorCode,
+                h_id: number,
+                uid_c: number
+            ) => {
+                alert(
+                    `Rollback:[error_code=${error_code}|h_id=${h_id}|uid_c=${uid_c}]\nНе получилось прочитать файл.`
+                );
+            };
+            console.log(r);
+            this.$store.dispatch(`wbs/send_transaction`, r);
+        },
+    },
+
+    beforeCreate() {
+        // Инициализируем подключение к Python серверу через Web Socket
+        this.$store.dispatch("wbs/initWebSocket");
+    },
+};
+</script>
+<style lang="scss">
+@import "../gcolor.scss";
+
+.app {
+    background: $ЦветФона;
+    color: $БазовыйЦветТекста;
+    min-height: 100vh;
+}
+
+.test_box {
+    display: flex;
+    border: 1px solid #000;
+    flex-direction: column;
+    height: 50%;
+}
+</style>

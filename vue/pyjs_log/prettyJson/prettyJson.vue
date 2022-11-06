@@ -37,7 +37,7 @@ export default {
 };
 </script>
 <style lang="scss">
-@import "wbs/vue/gcolor.scss";
+@import "../../gcolor.scss";
 
 $ЦветФон: $ЦветФонаВсплывающегоОкна;
 $ЦветЧисла: $ЯркоеВыделение;

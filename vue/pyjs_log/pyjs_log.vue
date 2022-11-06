@@ -112,7 +112,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import "wbs/vue/gcolor.scss";
+@import "../gcolor.scss";
 
 .fade-enter-active,
 .fade-leave-active {
