@@ -4,7 +4,7 @@
         <div class="test_box">
             <testUseServer
                 :get_h_id="test_send.get_h_id"
-                :label="`Стенд для тестирования`"
+                :label="`Тестовый стенд PywJs`"
                 :template="test_send.template"
                 :type_send="test_send.type_send"
                 @send="send"
