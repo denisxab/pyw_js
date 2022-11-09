@@ -1,19 +1,14 @@
 <template>
-    <transition name="fade">
-        <div class="log" v-show="isShow == true">
-            <div class="log__info">
-                <span>Подключение</span>
-                <div class="textarea">{{ wbsStatus }}</div>
-                <span>Ответ</span>
-                <PrettyJson :JsonPretty="JsonPretty" />
-            </div>
-            <div class="log__use">
-                <input
-                    @click="disconnect"
-                    type="button"
-                    value="Разорвать связь"
-                />
-                <!-- <input
+    <div class="log" v-show="isShow == true">
+        <div class="log__info">
+            <span>Подключение</span>
+            <div class="textarea">{{ wbsStatus }}</div>
+            <span>Ответ</span>
+            <PrettyJson :JsonPretty="JsonPretty" />
+        </div>
+        <div class="log__use">
+            <input @click="disconnect" type="button" value="Разорвать связь" />
+            <!-- <input
                     @click="TestSend"
                     type="button"
                     value="Проверочный запрос"
@@ -23,9 +18,8 @@
                     type="button"
                     value="Доступные функции"
                 /> -->
-            </div>
         </div>
-    </transition>
+    </div>
     <div class="log__status">
         <div
             class="status_code"
@@ -114,14 +108,6 @@ export default {
 <style lang="scss" scoped>
 @import "../gcolor.scss";
 
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s;
-}
-.fade-enter,
-.fade-leave-to {
-    opacity: 0;
-}
 input {
     margin-left: 4px;
     background: $ЦветФонаПодсказки;
@@ -136,6 +122,7 @@ input {
     height: 100%;
 }
 .log {
+    z-index: 99;
     position: fixed;
     bottom: 0;
     right: 0;
