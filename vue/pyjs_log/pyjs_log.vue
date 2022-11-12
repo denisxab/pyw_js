@@ -234,6 +234,7 @@ input {
     height: 100%;
 }
 .log__status {
+    z-index: 99;
     box-shadow: inset 0 0 15px 2px #000;
     display: flex;
     position: fixed;
