@@ -15,14 +15,15 @@
             <div class="h_id_s">
                 <input
                     class="h_id"
-                    v-for="(value, name, index) in ArrayH_ID"
+                    v-for="it in ArrayH_ID"
                     type="button"
                     :class="{
-                        update: value.is_update,
-                        select: value.is_select,
+                        update: it[1].is_update,
+                        select: it[1].is_select,
                     }"
-                    :h_id="name"
-                    :value="value.alias"
+                    :h_id="it[0]"
+                    :key="it[0]"
+                    :value="it[1].alias"
                     @click="clickHID"
                 />
             </div>
@@ -143,7 +144,12 @@ export default {
                         }
                     }
                 }
-                return this.DictH_ID_CheckUid_C;
+                // Сортируем по имени алиаса
+                return Object.entries(<TArrH_ID>this.DictH_ID_CheckUid_C).sort(
+                    (a: [string, TH_ID], b: [string, TH_ID]): any => {
+                        return a[1].alias > b[1].alias;
+                    }
+                );
             }
             return {};
         },
