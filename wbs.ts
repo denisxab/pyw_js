@@ -51,7 +51,7 @@ export interface SendParams {
         | ClientsWbsRequest_GetInfoServer
         | ClientsWbsRequest_ImportFromServer;
 }
-/* ------------------------------------------------------------------ */
+/* ---------------------- Для транзакций  -------------------------------------------- */
 /* Аргументы в функцию для отправки сообщения в режиме транзакции */
 export interface SendParamsTransaction extends SendParams {
     rollback: TRollback;
@@ -92,11 +92,11 @@ export interface TTransaction_set {
         rollback_because_error: CallableFunction;
     };
 }
-// Сколько по умолчанию ждать ответ от сервера
-const _timeout_ms: number = 2000;
 
 /* ------------------------------------------------------------------ */
 /* Логика WebSocket */
+// Сколько по умолчанию ждать ответ от сервера
+const _timeout_ms: number = 2000;
 export class Wbs {
     /*
 	Пример описан в `readme.md/Интеграция/JS`
@@ -636,6 +636,9 @@ export class Wbs {
         return res_server_json;
     }
 }
+//
+// -------------  Утилиты ------------------------------------
+//
 /* Получить текущие время */
 function nowTime(): string {
     const current_date = new Date();
@@ -652,4 +655,24 @@ function nowTime(): string {
         ":" +
         current_date.getSeconds()
     );
+}
+
+/* Класс для создания объекта в котором будут храниться псевдонимы на h_id */
+export class ClassHID {
+    /*
+    Для получения h_id по псевдониму
+    >obj.names.Псевдоним
+    Для получения псевдонима по h_id 
+    >obj.ids.Псевдоним
+    */
+    // Хранит псевдонимы и указывает на h_id
+    names: { [key: string]: number } = {};
+    // Хранит h_id и указывает на псевдонимы
+    ids: { [key: number]: string } = {};
+    constructor(args_name: { [key: string]: number }) {
+        for (const i in args_name) {
+            this.names[i] = args_name[i];
+            this.ids[args_name[i]] = i;
+        }
+    }
 }

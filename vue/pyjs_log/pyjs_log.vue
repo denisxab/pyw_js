@@ -1,5 +1,5 @@
 <template>
-    <div class="log__status">
+    <div @click="hiddenWindow" class="log__status">
         <div
             class="status_code"
             :class="{
@@ -8,7 +8,7 @@
                 error_connect: wbsStatusCode == 3,
             }"
         />
-        <input @click="hiddenWindow" type="button" :value="isHideShow" />
+        <input type="button" :value="isHideShow" />
     </div>
     <div class="log" v-show="isShow == true">
         <div class="log__use">
@@ -21,7 +21,8 @@
                         update: value.is_update,
                         select: value.is_select,
                     }"
-                    :value="name"
+                    :h_id="name"
+                    :value="value.alias"
                     @click="clickHID"
                 />
             </div>
@@ -38,9 +39,9 @@
                 /> -->
         </div>
         <div class="log__info">
-            <span>Подключение</span>
-            <div class="textarea">{{ wbsStatus }}</div>
-            <span>Ответ</span>
+            <!-- <span>Подключение</span> -->
+            <div class="wbsStatus">{{ wbsStatus }}</div>
+            <!-- <span>Ответ</span> -->
             <PrettyJson :JsonPretty="textViewH_ID" />
         </div>
     </div>
@@ -53,7 +54,7 @@ import {
     ServerWbsResponse,
     WbsCloseStatus,
 } from "../../wbs_type";
-import { WbsConnectStatus } from "../../wbs";
+import { ClassHID, WbsConnectStatus } from "../../wbs";
 
 interface TH_ID {
     uid_c: string;
@@ -61,9 +62,11 @@ interface TH_ID {
     is_update: boolean;
     // Элемент выбран
     is_select: boolean;
+    // Псевдоним для h_id
+    alias: string;
 }
 interface TArrH_ID {
-    [key: string]: TH_ID;
+    [key: number]: TH_ID;
 }
 interface TAllJson {
     [key: string]: ServerWbsResponse;
@@ -71,15 +74,13 @@ interface TAllJson {
 export default {
     components: { PrettyJson },
     props: {
-        /* Показывать ли подробное окно */
-        isShow: {
-            type: Boolean,
-            default: () => true,
-            required: true,
-        },
+        // Алиасы для h_id
+        hids: { type: ClassHID, default: undefined },
     },
     data() {
         return {
+            // Показывать ли подробное окно
+            isShow: false,
             // Все ответы от сервера которые хранятся в хранилище `wbsStore.ts`
             AllJson: <TAllJson>{},
             // Объект для отслеживания обновления в h_id путем сравнения uid_c
@@ -118,9 +119,14 @@ export default {
                     const uid_c: number = this.AllJson[h_id].uid_c;
                     // Если нет такого h_id
                     if (!this.DictH_ID_CheckUid_C[h_id]) {
+                        // Пытаемся получить алиас на  h_id
+                        const alias: string | undefined = this.hids
+                            ? this.hids.ids[h_id]
+                            : undefined;
                         this.DictH_ID_CheckUid_C[h_id] = {
                             uid_c: uid_c,
                             is_update: true,
+                            alias: alias ? alias : h_id,
                         };
                     }
                     // Если есть такой h_id, то проверяем разницу по uid_c
@@ -152,7 +158,7 @@ export default {
         },
         /* Скрыть окно */
         hiddenWindow() {
-            this.$emit("update:isShow", !this.isShow);
+            this.isShow = !this.isShow;
         },
         /* Нажатие на H_ID */
         clickHID(event: Event) {
@@ -162,7 +168,7 @@ export default {
                     // Убираем выбор с прошлого элемента
                     this.DictH_ID_CheckUid_C[this.lastH_ID].is_select = false;
                 }
-                const h_id = elm.value;
+                const h_id = elm.attributes["h_id"].value;
                 // Меняем выбранный h_id
                 this.viewH_ID = h_id;
                 // Убираем обновление
@@ -214,7 +220,7 @@ input {
     display: inline-block;
     border: none;
     &:hover {
-        box-shadow: inset 0 0 15px 2px #000;
+        box-shadow: inset 0 0 10px 1px $ЦветФона;
     }
 }
 .prettyJson {
@@ -255,7 +261,6 @@ input {
     background: $ЦветФона;
     height: 80vh;
     width: 80vw;
-    // overflow: auto;
     flex-direction: row;
     display: flex;
     border: none;
@@ -267,9 +272,9 @@ input {
         flex-direction: column;
         align-items: flex-end;
         height: 100%;
-        width: 95%;
+        width: 90%;
         span {
-            align-self: flex-start;
+            align-self: flex-end;
             margin-bottom: 8px;
             font-size: small;
             margin-top: 8px;
@@ -278,12 +283,15 @@ input {
             padding: 6px;
             border-radius: 5px;
         }
-        .textarea {
+        .wbsStatus {
+            height: 2.2em;
             resize: vertical;
             background: $ЦветФонаВсплывающегоОкна;
             border: none;
+            margin-bottom: 6px;
             color: $ПриглушенныйЦветТекста;
             padding: 6px;
+            margin-top: 12px;
             width: 100%;
         }
     }
@@ -291,23 +299,26 @@ input {
         margin-top: 8px;
         height: 100%;
         margin-right: 4px;
-        width: 5%;
+        width: 10%;
         .h_id_s {
-            overflow: scroll;
+            overflow: auto;
             display: flex;
             flex-direction: column;
             height: 100%;
             width: 100%;
             justify-content: start;
             input {
+                text-align: left;
                 font-size: 16px;
-                flex-basis: 3em;
+                width: 100%;
+                flex-basis: 2.2em;
                 margin: 4px;
+                background: $ЦветФона;
                 &.update {
-                    border: 1px solid yellow;
+                    color: $ЯркоеВыделение;
                 }
                 &.select {
-                    box-shadow: inset 0 0 15px 2px #000;
+                    background: $ЦветФонаВсплывающегоОкна;
                 }
             }
         }
