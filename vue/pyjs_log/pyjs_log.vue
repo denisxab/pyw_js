@@ -26,7 +26,7 @@
                     :value="it[1].alias"
                     @click="clickHID"
                 />
-            </div>  
+            </div>
             <!-- <input @click="disconnect" type="button" value="Разорвать связь" /> -->
             <!-- <input
                     @click="TestSend"
@@ -267,7 +267,8 @@ input {
     right: 0;
     background: $ЦветФона;
     height: 80vh;
-    width: 80vw;
+    width: 85vw;
+    max-width: 1000px;
     flex-direction: row;
     display: flex;
     border: none;
@@ -279,7 +280,7 @@ input {
         flex-direction: column;
         align-items: flex-end;
         height: 100%;
-        width: 90%;
+        width: 85%;
         span {
             align-self: flex-end;
             margin-bottom: 8px;
@@ -306,7 +307,7 @@ input {
         margin-top: 8px;
         height: 100%;
         margin-right: 4px;
-        width: 10%;
+        width: 15%;
         .h_id_s {
             overflow: auto;
             display: flex;
