@@ -6,10 +6,6 @@ import {
 } from "../wbs";
 import { ServerWbsResponse } from "../wbs_type";
 
-const token = "sysdba";
-const host = "localhost";
-const port = 9999;
-
 export const wbsStore = {
     // Доступные переменные в хранилище
     state() {
@@ -106,10 +102,14 @@ export const wbsStore = {
                 rollback
             );
         },
-        /* Инициализация Web Socket */
+        /* Инициализация  Web Socket соединение */
         initWebSocket(
             { commit, dispatch },
             {
+                host = "localhost",
+                port = 9999,
+                token = "",
+                user = "base",
                 after_connect = <CallableFunction>undefined,
                 destruction = <CallableFunction>undefined,
             }
@@ -117,6 +117,7 @@ export const wbsStore = {
             /*
             after_connect: Что сделать после подключения к серверу
             destruction: Обработка события window.beforeunload
+            user: Имя текущего пользователя
             */
 
             // Создаем подключение
@@ -144,6 +145,7 @@ export const wbsStore = {
                             status_text,
                         });
                     },
+                    user: user,
                 })
             );
             // Добавляем обработчик закрытия страницы, здесь нужно выполнять отчистку ресурсов.

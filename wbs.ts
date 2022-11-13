@@ -10,6 +10,9 @@ import {
     ClientsWbsRequest_GetInfoServer_id,
     ClientsWbsRequest_ModAlternatives,
     ClientsWbsRequest_Mod,
+    ClientsWbsRequest_CacheAddKey,
+    ClientsWbsRequest_CreateSubscribe,
+    ClientsWbsRequest_CacheReadKey,
 } from "./wbs_type";
 /* ------------------------------------------------------------------ */
 
@@ -46,10 +49,13 @@ export interface SendParams {
     uid_c?: number | undefined;
     //  Тело запроса
     body:
-        | ClientsWbsRequest_AllowedFunc
         | ClientsWbsRequest_ExeCommand
         | ClientsWbsRequest_GetInfoServer
-        | ClientsWbsRequest_ImportFromServer;
+        | ClientsWbsRequest_ImportFromServer
+        | ClientsWbsRequest_CreateSubscribe
+        | ClientsWbsRequest_AllowedFunc
+        | ClientsWbsRequest_CacheAddKey
+        | ClientsWbsRequest_CacheReadKey;
 }
 /* ---------------------- Для транзакций  -------------------------------------------- */
 /* Аргументы в функцию для отправки сообщения в режиме транзакции */
@@ -110,6 +116,8 @@ export class Wbs {
     token: string;
     // Статус токина
     w_status: number;
+    // Имя текущего пользователя
+    user: string;
     /////////////////////////////////////////////////////
     // Подключение
     _wbs_connect: WebSocket;
@@ -141,6 +149,7 @@ export class Wbs {
                 status_code: WbsConnectStatus,
                 status_text: string
             ) => {},
+            user = "base",
         } = {}
     ) {
         /*
@@ -167,6 +176,7 @@ export class Wbs {
         this.transaction_dict = {};
         this.token = token;
         this.w_status = 0;
+        this.user = user;
         this._generator_uid_c = 0;
         this.callback_update_status = callback_updateS_status;
         this._dependent_list = [];
@@ -240,16 +250,31 @@ export class Wbs {
         this._smart_connect(tmp_wbs, event_connect, event_error_connect);
     }
     //
-    /* Отправить сообщение*/
+    /* Отправить сообщение */
     //
     send({ mod, h_id, uid_c, body }: SendParams) {
         // Если не указан uid_c то генерируем его.
         if (uid_c === undefined) uid_c = this.getUidC();
-        // Если еть подключение то отправляем сообщение
+        // Если есть подключение то отправляем сообщение
         if (
             this._wbs_connect !== undefined &&
             this.w_status == WbsConnectStatus.connect
         ) {
+            /* Пред обработка тела запроса */
+            switch (mod) {
+                // Добавляем имя текущего пользователя, если не указано ни какое имя
+                case ClientsWbsRequest_Mod.cache_add_key:
+                case ClientsWbsRequest_Mod.cache_read_key: {
+                    body = <ClientsWbsRequest_CacheAddKey>body;
+                    if (!body.user) {
+                        body.user = this.user;
+                    }
+                    break;
+                }
+            }
+            //
+            // Отправка сообщения на сервер
+            //
             this._wbs_connect.send(
                 JSON.stringify(<ClientsWbsRequest>{
                     h_id: h_id,

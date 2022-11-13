@@ -26,7 +26,7 @@
                     :value="it[1].alias"
                     @click="clickHID"
                 />
-            </div>
+            </div>  
             <!-- <input @click="disconnect" type="button" value="Разорвать связь" /> -->
             <!-- <input
                     @click="TestSend"

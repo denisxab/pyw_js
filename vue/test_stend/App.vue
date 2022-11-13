@@ -109,8 +109,8 @@ export default {
                             id_r: ClientsWbsRequest_GetInfoServer_id.info_event,
                         },
                     }),
-                    create_event: strJSON(<ClientsWbsRequest>{
-                        mod: ClientsWbsRequest_Mod.create_event,
+                    event_create: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.event_create,
                         h_id: get_h_id,
                         body: {
                             n_func: "watchDir",
@@ -121,16 +121,16 @@ export default {
                             kwargs: {},
                         },
                     }),
-                    sub_event: strJSON(<ClientsWbsRequest>{
-                        mod: ClientsWbsRequest_Mod.sub_event,
+                    event_sub: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.event_sub,
                         h_id: get_h_id,
                         body: {
                             n_func: "watchDir",
                             mod: "_",
                         },
                     }),
-                    unsub_event: strJSON(<ClientsWbsRequest>{
-                        mod: ClientsWbsRequest_Mod.unsub_event,
+                    event_unsub: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.event_unsub,
                         h_id: get_h_id,
                         body: {
                             n_func: "watchDir",

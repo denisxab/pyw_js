@@ -1,5 +1,5 @@
 export interface DT_HelpAllowed{
-/*AUTO_GEN:2022-11-05 15:45:22.639614
+/*AUTO_GEN:2022-11-13 20:31:52.891059
 
     Структура подсказки доступной функции
     	
@@ -14,7 +14,7 @@ export interface DT_HelpAllowed{
 	qualname:string;
 }
 export enum WbsCloseStatus{
-/*AUTO_GEN:2022-11-05 15:45:22.639650
+/*AUTO_GEN:2022-11-13 20:31:52.891125
 	
 */
 	//  https://github.com/Luka967/websocket-close-codes
@@ -39,7 +39,7 @@ export enum WbsCloseStatus{
 	authentication_error =  4001,
 }
 export enum ClientsWbsRequest_Mod{
-/*AUTO_GEN:2022-11-05 15:45:22.639660
+/*AUTO_GEN:2022-11-13 20:31:52.891147
 
     Модификации для запроса
     	
@@ -53,16 +53,20 @@ export enum ClientsWbsRequest_Mod{
 	//  ClientsWbsRequest_ImportFromServer - Импорт на сервер указанных библиотек
 	import_from_server =  4,
 	//  ClientsWbsRequest_CreateSubscribe - Клиент создает событие
-	create_event =  5,
+	event_create =  5,
 	//  ClientsWbsRequest_SubscribeEvent - Клиент подписывается на событие
-	sub_event =  6,
+	event_sub =  6,
 	//  ClientsWbsRequest_UnSubscribeEvent - Клиент подписывается на событие
-	unsub_event =  7,
+	event_unsub =  7,
+	//  ClientsWbsRequest_CacheAddKey - Записать пользовательский кеш по ключу
+	cache_add_key = 8,
+	//  ClientsWbsRequest_CacheReadKey - Прочитать пользовательский кеш по ключу
+	cache_read_key = 9,
 }
 export enum ClientsWbsRequest_ModAlternatives{
-/*AUTO_GEN:2022-11-05 15:45:22.639668
+/*AUTO_GEN:2022-11-13 20:31:52.891166
 
-    Альтернативные модификации для запроса, будут использоваться для замены модификаций `ClientsWbsRequest_Mod` 
+    Альтернативные модификации для запроса, будут использоваться для замены модификаций `ClientsWbsRequest_Mod`
     на более специфичные
     	
 */
@@ -70,7 +74,7 @@ export enum ClientsWbsRequest_ModAlternatives{
 	transaction_func =  101,
 }
 export interface ClientsWbsRequest_ImportFromServer{
-/*AUTO_GEN:2022-11-05 15:45:22.639671
+/*AUTO_GEN:2022-11-13 20:31:52.891172
 
     Импорт на сервер указанных библиотек
     	
@@ -79,7 +83,7 @@ export interface ClientsWbsRequest_ImportFromServer{
 	import_sts_exe:string;
 }
 export interface ClientsWbsRequest_AllowedFunc{
-/*AUTO_GEN:2022-11-05 15:45:22.639675
+/*AUTO_GEN:2022-11-13 20:31:52.891180
 
     Исполнение разрешенных функций
     	
@@ -92,7 +96,7 @@ export interface ClientsWbsRequest_AllowedFunc{
 	kwargs:object|undefined;
 }
 export interface ClientsWbsRequest_CreateSubscribe{
-/*AUTO_GEN:2022-11-05 15:45:22.639683
+/*AUTO_GEN:2022-11-13 20:31:52.891197
 
     Клиент создает событие на сервере
     	
@@ -111,7 +115,7 @@ export interface ClientsWbsRequest_CreateSubscribe{
 	kwargs:object|undefined;
 }
 export interface ClientsWbsRequest_SubscribeEvent{
-/*AUTO_GEN:2022-11-05 15:45:22.639696
+/*AUTO_GEN:2022-11-13 20:31:52.891213
 
     Клиент подписывается на существующие события сервера
     	
@@ -126,7 +130,7 @@ export interface ClientsWbsRequest_SubscribeEvent{
 	mod:string;
 }
 export interface ClientsWbsRequest_UnSubscribeEvent{
-/*AUTO_GEN:2022-11-05 15:45:22.639700
+/*AUTO_GEN:2022-11-13 20:31:52.891221
 
     Клиент отписывается от события на сервере
     	
@@ -140,8 +144,32 @@ export interface ClientsWbsRequest_UnSubscribeEvent{
 	//  аргументами.
 	mod:string;
 }
+export interface ClientsWbsRequest_CacheAddKey{
+/*AUTO_GEN:2022-11-13 20:31:52.891230
+
+    Записать пользовательский кеш по ключу
+    	
+*/
+	//  Пользователь
+	user:string;
+	//  Ключ
+	key:string;
+	//  Значение
+	value:string;
+}
+export interface ClientsWbsRequest_CacheReadKey{
+/*AUTO_GEN:2022-11-13 20:31:52.891239
+
+    Прочитать пользовательский кеш по ключу
+    	
+*/
+	//  Пользователь
+	user:string;
+	//  Ключ
+	key:string;
+}
 export interface ClientsWbsRequest_ExeCommand{
-/*AUTO_GEN:2022-11-05 15:45:22.639706
+/*AUTO_GEN:2022-11-13 20:31:52.891247
 
     Исполнение произвольной команды
     	
@@ -150,7 +178,7 @@ export interface ClientsWbsRequest_ExeCommand{
 	exec:string;
 }
 export enum ClientsWbsRequest_GetInfoServer_id{
-/*AUTO_GEN:2022-11-05 15:45:22.639709
+/*AUTO_GEN:2022-11-13 20:31:52.891252
 	
 */
 	//  Получить список доступных функций
@@ -161,7 +189,7 @@ export enum ClientsWbsRequest_GetInfoServer_id{
 	info_event =  3,
 }
 export interface ClientsWbsRequest_GetInfoServer{
-/*AUTO_GEN:2022-11-05 15:45:22.639712
+/*AUTO_GEN:2022-11-13 20:31:52.891260
 
     Получить информацию о сервере
     	
@@ -172,7 +200,7 @@ export interface ClientsWbsRequest_GetInfoServer{
 	text:string|undefined;
 }
 export interface ClientsWbsRequest{
-/*AUTO_GEN:2022-11-05 15:45:22.639723
+/*AUTO_GEN:2022-11-13 20:31:52.891282
 
     Запрос клиента, для сервера
     	
@@ -186,12 +214,12 @@ export interface ClientsWbsRequest{
 	//  Идентификатор команды, нужен если используется асинхронность
 	uid_c:number;
 	//  Тело запроса
-	body:ClientsWbsRequest_ExeCommand|ClientsWbsRequest_GetInfoServer|ClientsWbsRequest_ImportFromServer|ClientsWbsRequest_CreateSubscribe|ClientsWbsRequest_AllowedFunc;
+	body:ClientsWbsRequest_ExeCommand|ClientsWbsRequest_GetInfoServer|ClientsWbsRequest_ImportFromServer|ClientsWbsRequest_CreateSubscribe|ClientsWbsRequest_AllowedFunc|ClientsWbsRequest_CacheAddKey|ClientsWbsRequest_CacheReadKey;
 	//  Время отправки сообщения от клиента в UNIX формате.
 	t_send:number;
 }
 export enum WbsResponseCode{
-/*AUTO_GEN:2022-11-05 15:45:22.639747
+/*AUTO_GEN:2022-11-13 20:31:52.891350
 
     Список кодов ответа
     	
@@ -206,13 +234,15 @@ export enum WbsResponseCode{
 	ok =  200,
 	//  Сообщение в качестве уведомления
 	notify =  201,
-	//  Произошел откат транзакции, по причине клиента(например превышено время ожидания ответа)
+	//  Произошел откат транзакции, по причине клиента(например превышено время
+
+	//  ожидания ответа)
 	rollback_from_clients =  401,
 	//  Произошел откат транзакции, по причине сервера
 	rollback_from_server =  402,
 }
 export interface ServerWbsResponse{
-/*AUTO_GEN:2022-11-05 15:45:22.639756
+/*AUTO_GEN:2022-11-13 20:31:52.891365
 
     Ответ от сервера, для клиента
     	
