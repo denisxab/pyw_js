@@ -57,6 +57,10 @@ export interface SendParams {
         | ClientsWbsRequest_CacheAddKey
         | ClientsWbsRequest_CacheReadKey;
 }
+/* Тип для аргументов последовательной отправки */
+export interface SendParamsBefore extends SendParams {
+    before: (last_res: ServerWbsResponse) => {};
+}
 /* ---------------------- Для транзакций  -------------------------------------------- */
 /* Аргументы в функцию для отправки сообщения в режиме транзакции */
 export interface SendParamsTransaction extends SendParams {
@@ -112,6 +116,8 @@ export class Wbs {
     force_set: Set<number>;
     // Множество для хранения `uid` которые выполняются в транзакции
     transaction_dict: TTransaction_set;
+    // Словарь для "последовательной отправки сообщений" {uid_c:ФункцияКоторуюВыполнитьПослеПолученияУспешногоОтвета}
+    before_map: Map<number, CallableFunction>;
     // Токен для сервера
     token: string;
     // Статус токина
@@ -177,6 +183,7 @@ export class Wbs {
         this.token = token;
         this.w_status = 0;
         this.user = user;
+        this.before_map = new Map();
         this._generator_uid_c = 0;
         this.callback_update_status = callback_updateS_status;
         this._dependent_list = [];
@@ -212,6 +219,15 @@ export class Wbs {
             if (this.force_set.has(res_uid_c)) {
                 // То удаляем этот uid из обязательного множества, так как это считается получением ответа от сервера
                 this.force_set.delete(res_uid_c);
+                //
+                // Проверяем запрос на вариант отправки "Последовательное сообщение"
+                //
+                if (this.before_map.has(res_uid_c)) {
+                    // Выполняем функцию, и передаем в ней, текущий ответ.
+                    this.before_map.get(res_uid_c)(res_server_json);
+                    // Удаляем из `before_map` так как все необходимое сделано.
+                    this.before_map.delete(res_uid_c);
+                }
             }
             // Если uid есть в `transaction_dict`
             if (this.transaction_dict[res_uid_c]) {
@@ -465,6 +481,20 @@ export class Wbs {
         else {
             rollback(TRollbackErrorCode.duplicate_uid, h_id, uid_c, undefined);
         }
+    }
+    /* Последовательная отправка сообщений */
+    send_before({ mod, h_id, body, before }: SendParamsBefore) {
+        // Если не указан uid_c то генерируем его.
+        const uid_c = this.getUidC();
+        // Заносим в словарь номер запроса и функцию которую нужно выполнить после успешного получения ответа.
+        this.before_map.set(uid_c, before);
+        // Отправка через `this.send_force`, с доработками в `tmp_wbs.onmessage`, которые выполняют функцию после успешного получения ответа.
+        this.send_force({
+            mod: mod,
+            h_id: h_id,
+            body: body,
+            uid_c: uid_c,
+        });
     }
     //
     //

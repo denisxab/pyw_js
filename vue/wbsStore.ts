@@ -1,5 +1,6 @@
 import {
     SendParams,
+    SendParamsBefore,
     SendParamsTransaction,
     Wbs,
     WbsConnectStatus,
@@ -101,6 +102,15 @@ export const wbsStore = {
                 },
                 rollback
             );
+        },
+        /* Последовательная отправка сообщения */
+        send_before({ state }, { mod, h_id, body, before }: SendParamsBefore) {
+            state.wbsObj.send_before({
+                mod: mod,
+                h_id: h_id,
+                body: body,
+                before: before,
+            });
         },
         /* Инициализация  Web Socket соединение */
         initWebSocket(

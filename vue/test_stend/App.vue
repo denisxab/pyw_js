@@ -26,8 +26,9 @@ import {
     ClientsWbsRequest,
     ClientsWbsRequest_GetInfoServer_id,
     ClientsWbsRequest_Mod,
+    ServerWbsResponse,
 } from "../../wbs_type";
-import { TRollbackErrorCode } from "../../wbs";
+import { SendParamsBefore, TRollbackErrorCode } from "../../wbs";
 
 function strJSON(obj: object) {
     return JSON.stringify(obj, null, 4);
@@ -163,6 +164,14 @@ export default {
                             user: "base",
                         },
                     }),
+                    send_before: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.cache_read_key,
+                        h_id: get_h_id,
+                        body: {
+                            key: "current_date",
+                            user: "base",
+                        },
+                    }),
                 },
             },
         };
@@ -202,6 +211,15 @@ export default {
             };
             console.log(r);
             this.$store.dispatch(`wbs/send_transaction`, r);
+        },
+        send_before(request) {
+            const r = JSON.parse(request);
+            r["before"] = (last_res: ServerWbsResponse) => {
+                alert(`Прошлый запрос ${JSON.parse(last_res, null, 2)}`);
+            };
+            console.log("send_force");
+            console.log(r);
+            this.$store.dispatch(`wbs/send_before`, <SendParamsBefore>r);
         },
     },
 
