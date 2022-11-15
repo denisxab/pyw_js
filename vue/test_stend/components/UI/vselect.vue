@@ -1,7 +1,7 @@
 <template>
-    <div class="vselect_box" :style="cssProps">
+    <div class="vselect_box">
         <label>{{ label }}</label>
-        <select v-model="modelValue" @change="changeOption" :style="cssProps">
+        <select v-model="modelValue" @change="changeOption">
             <option disabled value="">Выбор из списка</option>
             <option
                 v-if="type_select == 'dict'"
@@ -69,14 +69,6 @@ export default {
             this.$emit("change");
         }
     },
-    computed: {
-        cssProps() {
-            return {
-                "--Фон": this.background,
-                "--color": this.color,
-            };
-        },
-    },
 };
 </script>
 <style lang="scss" scoped>
@@ -85,12 +77,13 @@ export default {
     flex-direction: column;
     padding: 4px;
     margin: 8px;
-    border: 1px solid var(--color);
+    border: 1px solid v-bind(color);
     border-radius: 5px;
     label {
         text-align: center;
         display: block;
-        border-bottom: 1px solid;
+        color: v-bind(color);
+        border-bottom: 1px solid v-bind(color);
         padding: 8px;
     }
     select {
@@ -98,11 +91,11 @@ export default {
         display: block;
         background: transparent;
         border: none;
-        color: var(--color);
+        color: v-bind(color);
         font-size: medium;
         padding: 4px;
         &:hover {
-            box-shadow: inset 0px 0px 10px 1px var(--Фон);
+            box-shadow: inset 0px 0px 10px 1px v-bind(background);
         }
     }
 }

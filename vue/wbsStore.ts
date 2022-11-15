@@ -110,8 +110,8 @@ export const wbsStore = {
                 port = 9999,
                 token = "",
                 user = "base",
-                after_connect = <CallableFunction>undefined,
-                destruction = <CallableFunction>undefined,
+                after_connect = <CallableFunction>() => {},
+                destruction = <CallableFunction>() => {},
             }
         ) {
             /*

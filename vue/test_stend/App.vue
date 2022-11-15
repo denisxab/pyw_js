@@ -1,5 +1,5 @@
 <template>
-    <PyjsLog v-model:isShow="isShow" />
+    <PyjsLog />
     <div class="app">
         <div class="test_box">
             <testUseServer
@@ -7,6 +7,9 @@
                 :label="`Тестовый стенд PywJs`"
                 :template="test_send.template"
                 :type_send="test_send.type_send"
+                :token="token"
+                :host="host"
+                :port="port"
                 @send="send"
                 @send_force="send_force"
                 @send_dependent="send_dependent"
@@ -41,6 +44,10 @@ export type TTypeSend =
 
 const get_h_id = 89;
 
+const token = "sysdba";
+const host = "localhost";
+const port = "9999";
+
 export default {
     components: {
         PyjsLog,
@@ -49,7 +56,9 @@ export default {
     },
     data() {
         return {
-            isShow: false,
+            token: token,
+            host: host,
+            port: port,
             // Проверка обычной отправки SEND
             test_send: {
                 get_h_id: get_h_id,
@@ -181,7 +190,11 @@ export default {
 
     beforeCreate() {
         // Инициализируем подключение к Python серверу через Web Socket
-        this.$store.dispatch("wbs/initWebSocket");
+        this.$store.dispatch("wbs/initWebSocket", {
+            token: token,
+            host: host,
+            port: port,
+        });
     },
 };
 </script>

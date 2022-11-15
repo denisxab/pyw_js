@@ -12,6 +12,11 @@
     <h2 class="label">{{ label }}</h2>
     <div class="use_server">
         <div class="request">
+            <div class="setting_connect">
+                <input type="text" :placeholder="`token=${token}`" disabled />
+                <input type="text" :placeholder="`host=${host}`" disabled />
+                <input type="text" :placeholder="`port=${port}`" disabled />
+            </div>
             <vtextarea
                 :background="`#3b4252`"
                 :color="`#eceff4`"
@@ -19,8 +24,7 @@
             ></vtextarea>
             <div class="vselect">
                 <vselect
-                    :background="`#3b4252`"
-                    :color="`#eceff4`"
+                    :color="`#d8dee9`"
                     v-model="selectTemplate"
                     :options="template"
                     :type_select="`dict`"
@@ -28,8 +32,7 @@
                     @change="SelectChangeTemplate"
                 />
                 <vselect
-                    :background="`#3b4252`"
-                    :color="`#eceff4`"
+                    :color="`#d8dee9`"
                     :type_select="`list`"
                     v-model="selectSend"
                     :options="type_send"
@@ -67,6 +70,10 @@ export default {
         template: Object as () => TTemplateTestSend,
         // Варианты отправки
         type_send: Object as () => TTypeSend[],
+        //
+        token: String,
+        host: String,
+        port: String,
     },
     data() {
         return {
@@ -132,6 +139,21 @@ export default {
         display: flex;
         flex-direction: column;
         border: $БазовыйЦветПосещеннойСсылки solid 1px;
+        .setting_connect {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            padding: 4px;
+            input {
+                border-radius: 4px;
+                margin: 2px;
+                color: $ПриглушенныйЦветТекста;
+                background: $ЦветФонаВсплывающегоОкна;
+                border: none;
+                padding: 4px;
+                width: 100%;
+            }
+        }
         .vbutton {
             margin-top: 6px;
         }
