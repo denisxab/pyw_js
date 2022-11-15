@@ -104,12 +104,12 @@ export const wbsStore = {
             );
         },
         /* Последовательная отправка сообщения */
-        send_before({ state }, { mod, h_id, body, before }: SendParamsBefore) {
+        send_before({ state }, { mod, h_id, body, after }: SendParamsBefore) {
             state.wbsObj.send_before({
                 mod: mod,
                 h_id: h_id,
                 body: body,
-                before: before,
+                after: after,
             });
         },
         /* Инициализация  Web Socket соединение */

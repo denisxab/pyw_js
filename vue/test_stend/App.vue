@@ -217,7 +217,7 @@ export default {
         },
         send_before(request) {
             const r = JSON.parse(request);
-            r["before"] = (last_res: ServerWbsResponse) => {
+            r["after"] = (last_res: ServerWbsResponse) => {
                 alert(`Прошлый запрос ${JSON.stringify(last_res, null, 2)}`);
             };
             console.log("send_before");

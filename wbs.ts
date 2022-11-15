@@ -59,7 +59,7 @@ export interface SendParams {
 }
 /* Тип для аргументов последовательной отправки */
 export interface SendParamsBefore extends SendParams {
-    before: (last_res: ServerWbsResponse) => {};
+    after: (last_res: ServerWbsResponse) => {};
 }
 /* ---------------------- Для транзакций  -------------------------------------------- */
 /* Аргументы в функцию для отправки сообщения в режиме транзакции */
@@ -483,11 +483,11 @@ export class Wbs {
         }
     }
     /* Последовательная отправка сообщений */
-    send_before({ mod, h_id, body, before }: SendParamsBefore) {
+    send_before({ mod, h_id, body, after }: SendParamsBefore) {
         // Если не указан uid_c то генерируем его.
         const uid_c = this.getUidC();
         // Заносим в словарь номер запроса и функцию которую нужно выполнить после успешного получения ответа.
-        this.before_map.set(uid_c, before);
+        this.before_map.set(uid_c, after);
         // Отправка через `this.send_force`, с доработками в `tmp_wbs.onmessage`, которые выполняют функцию после успешного получения ответа.
         this.send_force({
             mod: mod,
