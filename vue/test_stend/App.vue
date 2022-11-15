@@ -146,6 +146,23 @@ export default {
                             mod: "_",
                         },
                     }),
+                    cache_add_key: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.cache_add_key,
+                        h_id: get_h_id,
+                        body: {
+                            key: "current_date",
+                            value: JSON.stringify({ date: Date.now() }),
+                            user: "base",
+                        },
+                    }),
+                    cache_read_key: strJSON(<ClientsWbsRequest>{
+                        mod: ClientsWbsRequest_Mod.cache_read_key,
+                        h_id: get_h_id,
+                        body: {
+                            key: "current_date",
+                            user: "base",
+                        },
+                    }),
                 },
             },
         };
