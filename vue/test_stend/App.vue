@@ -14,6 +14,7 @@
                 @send_force="send_force"
                 @send_dependent="send_dependent"
                 @send_transaction="send_transaction"
+                @send_before="send_before"
             />
         </div>
     </div>
@@ -41,7 +42,8 @@ export type TTypeSend =
     | "send"
     | "send_force"
     | "send_dependent"
-    | "send_transaction";
+    | "send_transaction"
+    | "send_before";
 
 const get_h_id = 89;
 
@@ -68,6 +70,7 @@ export default {
                     "send_force",
                     "send_dependent",
                     "send_transaction",
+                    "send_before",
                 ],
                 template: <TTemplateTestSend>{
                     exec: strJSON(<ClientsWbsRequest>{
@@ -215,9 +218,9 @@ export default {
         send_before(request) {
             const r = JSON.parse(request);
             r["before"] = (last_res: ServerWbsResponse) => {
-                alert(`Прошлый запрос ${JSON.parse(last_res, null, 2)}`);
+                alert(`Прошлый запрос ${JSON.stringify(last_res, null, 2)}`);
             };
-            console.log("send_force");
+            console.log("send_before");
             console.log(r);
             this.$store.dispatch(`wbs/send_before`, <SendParamsBefore>r);
         },

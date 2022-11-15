@@ -57,7 +57,13 @@ import Vbutton from "./UI/vbutton.vue";
 import { TTypeSend as TTypeSend, TTemplateTestSend } from "../App.vue";
 
 export default {
-    emits: ["send", "send_force", "send_dependent", "send_transaction"],
+    emits: [
+        "send",
+        "send_force",
+        "send_dependent",
+        "send_transaction",
+        "send_before",
+    ],
     // Компоненты
     components: { Vbutton, Vtextarea, PrettyJson, Vselect },
     // Аргументы
