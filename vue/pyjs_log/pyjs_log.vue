@@ -40,6 +40,19 @@
                 /> -->
         </div>
         <div class="log__info">
+            <div class="url_connect">
+                <input
+                    type="text"
+                    v-model="letUrlFromNewConnect"
+                    placeholder="Новый ws://host:port/"
+                />
+                <input
+                    type="button"
+                    value="Переподключиться"
+                    @click="ConnectNewUrl"
+                />
+            </div>
+
             <!-- <span>Подключение</span> -->
             <div class="wbsStatus">{{ wbsStatus }}</div>
             <!-- <span>Ответ</span> -->
@@ -72,6 +85,8 @@ interface TArrH_ID {
 interface TAllJson {
     [key: string]: ServerWbsResponse;
 }
+const WbsCloseStatus_ = WbsCloseStatus;
+
 export default {
     components: { PrettyJson },
     props: {
@@ -92,6 +107,8 @@ export default {
             viewH_ID: 0,
             // Прошлый выбранный h_id
             lastH_ID: <number | undefined>undefined,
+            // URL для нового подключения
+            letUrlFromNewConnect: "",
         };
     },
 
@@ -158,7 +175,7 @@ export default {
         /* Принудительно разорвать соединение с сервером */
         disconnect() {
             this.$store.state.wbs.wbsObj.close(
-                WbsCloseStatus.normal,
+                WbsCloseStatus_.normal,
                 "Разрыв связи из логера"
             );
         },
@@ -186,6 +203,13 @@ export default {
                 // Прошлый элемент это текущий
                 this.lastH_ID = h_id;
             }
+        },
+
+        ConnectNewUrl() {
+            console.log(this.$store.state.wbs.wbsObj);
+            this.$store.state.wbs.wbsObj.connectNewUrl(
+                this.letUrlFromNewConnect
+            );
         },
         // /* Тестовая отправка сообщения на сервер */
         // TestSend() {
@@ -225,7 +249,9 @@ input {
     font-size: 14px;
     display: inline-block;
     border: none;
-    &:hover {
+    &:hover,
+    &:focus {
+        outline: none;
         box-shadow: inset 0 0 10px 1px $ЦветФона;
     }
 }
@@ -281,6 +307,22 @@ input {
         align-items: flex-end;
         height: 100%;
         width: 85%;
+        .url_connect {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            input {
+                width: 20%;
+                &:first-child {
+                    margin-left: 0px;
+                    padding: 5px;
+                    width: 80%;
+                }
+                &::placeholder {
+                    text-align: center;
+                }
+            }
+        }
         span {
             align-self: flex-end;
             margin-bottom: 8px;

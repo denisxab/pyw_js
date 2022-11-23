@@ -127,6 +127,8 @@ export class Wbs {
     /////////////////////////////////////////////////////
     // Подключение
     _wbs_connect: WebSocket;
+    // Url для подключения к WebSocket
+    _wbs_url: string;
     // Список команд которые считаются зависимостями
     _dependent_list: any[];
     // Указывает на то что было переподключение
@@ -187,8 +189,9 @@ export class Wbs {
         this._generator_uid_c = 0;
         this.callback_update_status = callback_updateS_status;
         this._dependent_list = [];
+        this._wbs_url = `ws://${host}:${port}/`;
         // Инициализация подключения по протоколу WebSocket к Python серверу
-        let tmp_wbs = new WebSocket(`ws://${host}:${port}/`);
+        let tmp_wbs = new WebSocket(this._wbs_url);
         // ------------------ Заранее указываем функции ----------------------
         // Функция в которой происходит отправка.
         tmp_wbs.onopen = (event) => {
@@ -547,6 +550,17 @@ export class Wbs {
     getUidC(): number {
         return this._GeneratorUidC();
     }
+    /* Подключиться к другому URL для `WebSocket` */
+    connectNewUrl(url: string) {
+        // Меняем url
+        this._wbs_url = url;
+        // Отключаемся от текущего url, а после отключения вызовется функция `_smart_connect`, которая будет
+        // пытаться подключиться по новому url
+        this.close(
+            WbsCloseStatus.disconnect_then_reconnect_new_url,
+            `NewUrl:${url}`
+        );
+    }
     /* Логика подключения к серверу, и переподключение к нему если соединение закрыто. */
     _smart_connect(
         use_wbs: WebSocket,
@@ -574,7 +588,7 @@ export class Wbs {
                 );
                 if (event_error_connect) event_error_connect();
                 // Переподключиться
-                this._wbs_connect = new WebSocket(this._wbs_connect.url);
+                this._wbs_connect = new WebSocket(this._wbs_url);
             }
             // Успешное подключение
             else if (
