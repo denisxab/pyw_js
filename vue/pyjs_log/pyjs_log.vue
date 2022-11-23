@@ -27,24 +27,13 @@
                     @click="clickHID"
                 />
             </div>
-            <!-- <input @click="disconnect" type="button" value="Разорвать связь" /> -->
-            <!-- <input
-                    @click="TestSend"
-                    type="button"
-                    value="Проверочный запрос"
-                />
-                <input
-                    @click="GetAllowedFunc"
-                    type="button"
-                    value="Доступные функции"
-                /> -->
         </div>
         <div class="log__info">
             <div class="url_connect">
                 <input
                     type="text"
                     v-model="UrlFromNewConnect"
-                    placeholder="Новый ws://host:port/"
+                    placeholder="ws://host:port/  |  Подключиться на новый URL ?"
                 />
                 <input
                     type="button"
@@ -62,12 +51,7 @@
 </template>
 <script lang="ts">
 import PrettyJson from "./prettyJson/prettyJson.vue";
-import {
-    ClientsWbsRequest_Mod,
-    ClientsWbsRequest_GetInfoServer_id,
-    ServerWbsResponse,
-    WbsCloseStatus,
-} from "../../wbs_type";
+import { ServerWbsResponse, WbsCloseStatus } from "../../wbs_type";
 import { ClassHID, WbsConnectStatus } from "../../wbs";
 
 interface TH_ID {
@@ -206,9 +190,7 @@ export default {
         },
         /* Подключиться к другому URL */
         ConnectNewUrl() {
-            this.$store.state.wbs.wbsObj.connectNewUrl(
-                this.UrlFromNewConnect
-            );
+            this.$store.state.wbs.wbsObj.connectNewUrl(this.UrlFromNewConnect);
         },
     },
 };
@@ -250,7 +232,7 @@ input {
         width: 30px;
         height: 30px;
         border-radius: 50%;
-        box-shadow: inset 0 0 5px 2px $ЦветФона;
+        box-shadow: inset 0 0 13px 1px $ЦветФона;
         &.connect {
             background: $Хорошо;
         }
