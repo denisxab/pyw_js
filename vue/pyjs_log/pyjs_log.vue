@@ -43,7 +43,7 @@
             <div class="url_connect">
                 <input
                     type="text"
-                    v-model="letUrlFromNewConnect"
+                    v-model="UrlFromNewConnect"
                     placeholder="Новый ws://host:port/"
                 />
                 <input
@@ -108,7 +108,7 @@ export default {
             // Прошлый выбранный h_id
             lastH_ID: <number | undefined>undefined,
             // URL для нового подключения
-            letUrlFromNewConnect: "",
+            UrlFromNewConnect: "",
         };
     },
 
@@ -204,36 +204,12 @@ export default {
                 this.lastH_ID = h_id;
             }
         },
-
+        /* Подключиться к другому URL */
         ConnectNewUrl() {
-            console.log(this.$store.state.wbs.wbsObj);
             this.$store.state.wbs.wbsObj.connectNewUrl(
-                this.letUrlFromNewConnect
+                this.UrlFromNewConnect
             );
         },
-        // /* Тестовая отправка сообщения на сервер */
-        // TestSend() {
-        //     this.$store.dispatch(`wbs/send`, {
-        //         mod: ClientsWbsRequest_Mod.exec,
-        //         h_id: -1,
-        //         uid_c: 0,
-        //         body: {
-        //             exec: "2+2",
-        //         },
-        //     });
-        // },
-        // /* Получить доступные функции на севере */
-        // GetAllowedFunc() {
-        //     this.$store.dispatch(`wbs/send`, {
-        //         mod: ClientsWbsRequest_Mod.info,
-        //         h_id: -1,
-        //         uid_c: 0,
-        //         body: {
-        //             id_r: ClientsWbsRequest_GetInfoServer_id.help_allowed,
-        //             // text: undefined,
-        //         },
-        //     });
-        // },
     },
 };
 </script>
